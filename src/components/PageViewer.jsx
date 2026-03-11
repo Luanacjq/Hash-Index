@@ -45,16 +45,16 @@ export default function PageViewer({ pages }) {
         <div className="flex items-center gap-2">
           <button
             onClick={prevPage}
-            className="p-2 bg-slate-700 rounded hover:bg-slate-600"
+            className="px-3 py-3 bg-slate-700 rounded hover:bg-slate-600"
           >
-            <ChevronLeft size={18} />
+            <ChevronLeft size={16} />
           </button>
 
           <button
             onClick={nextPage}
-            className="p-2 bg-slate-700 rounded hover:bg-slate-600"
+            className="px-3 py-3 bg-slate-700 rounded hover:bg-slate-600"
           >
-            <ChevronRight size={18} />
+            <ChevronRight size={16} />
           </button>
 
           <input
