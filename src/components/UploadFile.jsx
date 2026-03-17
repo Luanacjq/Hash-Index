@@ -18,7 +18,7 @@ export default function UploadFile({ setWords }) {
 
       const lines = text
         .split("\n")
-        .map((w) => w.trim())
+        .map((w) => w.trim().toLowerCase())
         .filter((w) => w !== "");
 
       setWords(lines);

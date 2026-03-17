@@ -2,7 +2,7 @@ import { useState } from "react";
 import UploadFile from "./components/UploadFile";
 import PageViewer from "./components/PageViewer";
 
-import { Database, FileText, Layers, PlayCircle } from "lucide-react";
+import { Database, FileText, Layers, PlayCircle, Search } from "lucide-react";
 
 export default function App() {
   const [words, setWords] = useState([]);
@@ -11,6 +11,10 @@ export default function App() {
   const [buckets, setBuckets] = useState([]);
   const [bucketSize] = useState(4);
   const [indexTime, setIndexTime] = useState(0);
+  const [collisions, setCollisions] = useState(0);
+  const [overflows, setOverflows] = useState(0);
+  const [searchWord, setSearchWord] = useState("");
+  const [searchResult, setSearchResult] = useState(null);
 
   function createPages() {
     if (words.length === 0) {
@@ -70,15 +74,23 @@ export default function App() {
     }
 
     const start = performance.now();
-
     const newBuckets = createBuckets();
+    let collisionCount = 0;
+    let overflowCount = 0;
 
     pages.forEach((page, pageIndex) => {
       page.forEach((word) => {
-        const bucketIndex = hashFunction(word, newBuckets.length);
+        const normalizedWord = word.trim().toLowerCase();
+        const bucketIndex = hashFunction(normalizedWord, newBuckets.length);
+        const bucket = newBuckets[bucketIndex];
 
-        newBuckets[bucketIndex].push({
-          key: word,
+        if (bucket.length >= bucketSize) {
+          collisionCount++;
+          overflowCount++;
+        }
+
+        bucket.push({
+          key: normalizedWord,
           page: pageIndex,
         });
       });
@@ -88,6 +100,42 @@ export default function App() {
 
     setBuckets(newBuckets);
     setIndexTime((end - start).toFixed(2));
+    setCollisions(collisionCount);
+    setOverflows(overflowCount);
+  }
+
+  function searchKey() {
+    if (!searchWord) return;
+
+    if (buckets.length === 0) {
+      alert("Construa o índice primeiro");
+      return;
+    }
+
+    const key = searchWord.trim().toLowerCase();
+    const bucketIndex = hashFunction(key, buckets.length);
+    const bucket = buckets[bucketIndex];
+
+    let foundPage = null;
+
+    for (let item of bucket) {
+      if (item.key.toLowerCase() === key) {
+        foundPage = item.page;
+        break;
+      }
+    }
+
+    if (foundPage !== null) {
+      setSearchResult({
+        found: true,
+        page: foundPage,
+        cost: 2,
+      });
+    } else {
+      setSearchResult({
+        found: false,
+      });
+    }
   }
 
   return (
@@ -134,7 +182,49 @@ export default function App() {
               </button>
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-2 gap-4 mt-6">
+            <div className="bg-slate-800/80 p-6 rounded-2xl border border-slate-700 mt-8">
+              <div className="flex items-center gap-2 mb-4">
+                <Search />
+                <h2 className="text-xl font-semibold">Buscar Palavra</h2>
+              </div>
+
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  placeholder="Digite a palavra..."
+                  value={searchWord}
+                  onChange={(e) => setSearchWord(e.target.value)}
+                  className="flex-1 p-3 rounded-lg text-black"
+                />
+
+                <button
+                  onClick={searchKey}
+                  className="bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded-lg"
+                >
+                  Buscar
+                </button>
+              </div>
+
+              {searchResult && (
+                <div className="mt-4 text-sm">
+                  {searchResult.found ? (
+                    <>
+                      <p className="text-green-400">
+                        Palavra encontrada na página {searchResult.page}
+                      </p>
+
+                      <p className="text-gray-400">
+                        Custo estimado: {searchResult.cost} leituras de página
+                      </p>
+                    </>
+                  ) : (
+                    <p className="text-red-400">Palavra não encontrada</p>
+                  )}
+                </div>
+              )}
+            </div>
+
+            <div className="grid grid-cols-3 md:grid-cols-3 gap-4 mt-6">
               <div className="bg-slate-700 p-4 rounded-lg text-center">
                 <p className="text-gray-400 text-sm">Total de palavras</p>
                 <p className="text-2xl font-bold">{words.length}</p>
@@ -153,6 +243,16 @@ export default function App() {
               <div className="bg-slate-700 p-4 rounded-lg text-center">
                 <p className="text-gray-400 text-sm">Tempo do índice</p>
                 <p className="text-2xl font-bold">{indexTime} ms</p>
+              </div>
+
+              <div className="bg-slate-700 p-4 rounded-lg text-center">
+                <p className="text-gray-400 text-sm">Colisões</p>
+                <p className="text-2xl font-bold">{collisions}</p>
+              </div>
+
+              <div className="bg-slate-700 p-4 rounded-lg text-center">
+                <p className="text-gray-400 text-sm">Overflow</p>
+                <p className="text-2xl font-bold">{overflows}</p>
               </div>
             </div>
           </div>
