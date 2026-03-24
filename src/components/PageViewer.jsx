@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { ChevronLeft, ChevronRight, Database, Search } from "lucide-react";
 
-export default function PageViewer({ pages }) {
+export default function PageViewer({ pages, highlightPage }) {
   const [currentPage, setCurrentPage] = useState(0);
   const [pageInput, setPageInput] = useState("");
 
@@ -35,7 +35,7 @@ export default function PageViewer({ pages }) {
   }
 
   return (
-    <div className="mt-12 bg-slate-800 p-6 rounded-2xl border border-slate-700">
+    <div className="mt-10 bg-slate-800 p-6 rounded-2xl border border-slate-700">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <Database />
@@ -83,7 +83,14 @@ export default function PageViewer({ pages }) {
 
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2">
         {page.slice(0, 25).map((word, i) => (
-          <div key={i} className="bg-slate-700 p-2 rounded text-sm text-center">
+          <div
+            key={i}
+            className={`p-2 rounded text-sm text-center ${
+              currentPage === highlightPage
+                ? "bg-yellow-500 text-black font-bold"
+                : "bg-slate-700"
+            }`}
+          >
             {word}
           </div>
         ))}
