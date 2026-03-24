@@ -1,4 +1,4 @@
-<h1 align="center">🚀 Hash Index vs Table Scan</h1>
+<h1 align="center">🚀 Hash Index</h1>
 
 <p align="center">
   Simulação interativa de busca em banco de dados
@@ -9,10 +9,6 @@
   <img src="https://img.shields.io/badge/Vite-Build-purple?logo=vite">
   <img src="https://img.shields.io/badge/Status-Completed-success">
   <img src="https://img.shields.io/badge/Focus-Data%20Structures-orange">
-</p>
-
-<p align="center">
-  <b>⚡ Hash Index</b> vs <b>🐢 Table Scan</b>
 </p>
 
 <hr>
